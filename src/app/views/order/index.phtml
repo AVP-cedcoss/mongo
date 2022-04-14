@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order List</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="container m-2 p-2">
+            <div class="container">
+                <h1 class="text text-primary fw fw-bold">Orders</h1>
+                <?=$this->tag->linkTo(
+                        [
+                            'order/add?role='.$this->request->getQuery('role'),
+                            'Add Order',
+                            'class' => 'btn btn-primary mb-2',
+                        ]
+                    );
+                ?>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                <thead>
+                    <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Customer Name</th>
+                    <th scope="col">Customer Address</th>
+                    <th scope="col">Zipcode</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    echo $content;
+                    ?>
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

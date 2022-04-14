@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="m-3 p-2 text-primary">
+            <h2>Login</h2>
+        </div>
+        <div class="m-3 p-3">
+            <?php
+            echo $this->tag->form("register/login");
+            echo "<label for='user_email'>Email</label>" . $this->tag->textField(
+                [
+                    'user_email',
+                    'class' => 'form-control',
+                    'placeholder' => 'E-mail'
+                ]
+            );
+
+            echo "<label for='user_password'>Password</label>" . $this->tag->textField(
+                [
+                    'user_password',
+                    'class' => 'form-control',
+                    'placeholder' => 'Password'
+                ]
+            );
+            echo $this->tag->submitButton(
+                [
+                    'Sign In',
+                    'class' => 'form-control mt-3 btn-primary',
+                    'name' => 'action'
+                ]
+            );
+            echo '<br>' . $this->tag->linkTo(
+                [
+                    'register/signup',
+                    'Register Here!',
+                    'class' => 'm-2 p-2 btn-primary rounded',
+                ]
+            );
+            ?>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

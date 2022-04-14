@@ -1,0 +1,60 @@
+<?php
+
+    echo "<br>";
+    echo $this->tag->form("index/index?lang=".$this->request->getPost('lang')."&".BEARER."=".$this->request->getQuery(BEARER));
+    echo "<label for='lang'>Language</label>".$this->tag->select(
+        [
+            'lang',
+            $language,
+            'useEmpty'   => false,
+            'class' => 'form-control',
+            ]
+        );
+        echo $this->tag->submitButton(
+            [
+                'Update Language', 
+                'class' => 'form-control mt-3 btn-primary',
+                'name' => 'action'
+                ]
+            );
+    echo "</form><br>";
+    echo "<label>".$list['Have a Wonderful Day']."</label><br>";
+    echo $this->tag->linkTo(
+        [
+            'product/index?'.BEARER.'='.$this->request->getQuery(BEARER),
+            $list['Product']." List",
+            'class' => 'btn btn-primary m-3',
+        ]
+    );
+    echo "<br>";
+    echo $this->tag->linkTo(
+        [
+            'order/index?'.BEARER.'='.$this->request->getQuery(BEARER),
+            $list['Order'].' List',
+            'class' => 'btn btn-primary m-3',
+        ]
+    );
+    echo "<br>";
+    echo $this->tag->linkTo(
+        [
+            'setting/index?'.BEARER.'='.$this->request->getQuery(BEARER),
+            $list['Settings'],
+            'class' => 'btn btn-primary m-3',
+        ]
+    );
+    echo "<br>";
+    echo $this->tag->linkTo(
+        [
+            'access/index?'.BEARER.'='.$this->request->getQuery(BEARER),
+            $list['Access'],
+            'class' => 'btn btn-primary m-3',
+        ]
+    );
+    echo "<br>";
+    echo $this->tag->linkTo(
+        [
+            'signup/index?'.BEARER.'='.$this->request->getQuery(BEARER),
+            $list['Signup'],
+            'class' => 'btn btn-primary m-3',
+        ]
+    );

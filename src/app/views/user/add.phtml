@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add User</title>
+    <!-- <link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+</head>
+<body>
+    <div class="container">
+        <div class="m-3 p-2 text-primary">
+            <h2>Add User</h2>
+        </div>
+        <div class="m-3 p-3">
+            <?php echo $this->tag->form("user/add?bearer=".$this->request->getQuery('bearer'));?>
+            <?php
+                echo "<label for='user_name'>Name</label>".$this->tag->textField(
+                    [
+                        'user_name', 
+                        'class' => 'form-control', 
+                        'placeholder' => 'Name'
+                    ]
+                );
+            ?>
+            <?php
+                echo "<label for='user_email'>Email</label>".$this->tag->textArea(
+                    [
+                        'user_email', 
+                        'class' => 'form-control', 
+                        'placeholder' => 'Email'
+                    ]
+                );
+            ?>
+            <?php
+                echo "<label for='user_password'>Password</label>".$this->tag->textField(
+                    [
+                        'user_password', 
+                        'class' => 'form-control', 
+                        'placeholder' => 'Password'
+                    ]
+                );
+            ?>
+            <?php
+                echo $this->tag->submitButton(
+                    [
+                        'Add User', 
+                        'class' => 'form-control mt-3 btn-primary',
+                        'name' => 'action'
+                    ]
+                );
+            ?>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
