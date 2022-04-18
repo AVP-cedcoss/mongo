@@ -34,7 +34,7 @@ class ProductController extends Controller
                     array_push($varient, array_combine($this->request->getPost('variationKey')[$i], $this->request->getPost('variationValue')[$i]));
                 }
                 for ($i = 0; $i < (count($this->request->getPost('variationKey'))); $i++) {
-                    $varient[$i]["VarientPrice"] = $this->request->getPost("variationPrice".$i);
+                    $varient[$i]["VariantPrice"] = $this->request->getPost("variationPrice".$i);
                 }
             }
 
@@ -48,7 +48,7 @@ class ProductController extends Controller
                 $product['meta'] = $meta;
             }
             if (isset($varient)) {
-                $product['varient'] = $varient;
+                $product['variant'] = $varient;
             }
             $this->mongo->product->insertOne($product);
             $this->response->redirect('product');

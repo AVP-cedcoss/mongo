@@ -23,28 +23,110 @@ class OrderController extends Controller
      */
     private function displayOrders()
     {
-        $orders = Orders::find();
-        $html='';
+        $filterStatus = 'All';
+        $endDate = date('Y-m-d');
+        $startDate = date('Y-m-d');
 
-        foreach ($orders as $value)
-        {
-            $prod_name = Products::find(
-                [
-                    'conditions' => 'product_id = :id:',
-                    'bind'       => [
-                        'id' => $value->product
+        if ($this->request->isPost('filterDate')) {
+            if ($this->request->getPost('filterDate') != 'Custom') {
+                $startDate = date('Y-m-d', strtotime($this->request->getPost('filterDate')));
+            }
+        }
+
+        if ($this->request->isPost('startDate')) {
+            $startDate = $this->request->getPost('startDate');
+        }
+
+        if ($this->request->isPost('endDate')) {
+            $endDate = $this->request->getPost('endDate');
+        }
+
+        $search = [
+            [
+                '$match' => [
+                    'order_date' => [
+                        '$gte' => $startDate,
+                        '$lte' => $endDate
                     ]
-                ]
-            )[0];
-            $html.= '
-            <tr class="text-align-center">
-                <td class="p-3 text-start">' . $value->order_id . '</td>
-                <td class="p-3">' . $value->customer_name . '</td>
-                <td class="p-3 fst-italic">' . $value->customer_address . '</td>
-                <td class="p-3 fst-italic">' . $value->zipcode . '</td>
-                <td class="p-3">' . $prod_name->product_name. '</td>
-                <td class="p-3">' . $value->product_quantity . '</td>
-                ';
+                ],
+            ]
+        ];
+
+        if ($this->request->isPost('filterStatus')) {
+            $filterStatus = $this->request->getPost('filterStatus');
+        }
+
+        if ($filterStatus != 'All') {
+            array_push($search, [
+                            '$match' => [
+                                'order_status' => $filterStatus
+                            ]
+                        ]);
+        }
+
+        if (1) {
+            // $search =
+            //     [
+            //         [
+            //             '$match' => [
+            //                 'order_date' => [
+            //                     '$gte' => $startDate,
+            //                     '$lte' => $endDate
+            //                 ]
+            //             ],
+            //         ],
+            //         [
+            //             '$match' => [
+            //                 'order_status' => $filterStatus
+            //             ]
+            //         ]
+            //     ];
+            // echo "<pre>";
+            // print_r($search);
+            // die;
+            $result = $this->mongo->order->aggregate($search);
+        } else {
+            $result = $this->mongo->order->find();
+        }
+
+        $html = '';
+        foreach ($result as $key => $value) {
+            $html .= '
+                <tr>
+                    <td>
+                        ' . $value->customer_name . '
+                    </td>
+                    <td>
+                        ' . $value->product_quantity . '
+                    </td>
+                    <td>
+                        ' . ++$value->variant . '
+                    </td>
+                    <td>
+                        ' . $value->order_date . '
+                    </td>
+                    <td id="status' . $value->_id . '">
+                        ' . $value->order_status . '
+                    </td>
+                    <td>
+                        <select name="status" id="statusUpdateOrder" class="form-control" data-id="' . $value->_id . '">
+                            <option>Paid</option>
+                            <option>Processing</option>
+                            <option>Dispatched</option>
+                            <option>Shipped</option>
+                            <option>Refunded</option>
+                        </select>
+                    </td>
+                    <td>
+                        <a href="/order/delete?id=' . $value->_id . '" class="btn btn-danger">Delete</a>
+                    </td>
+                    <td>
+                        <a data-id="' . $value->product_id . '" class="quickPeek btn btn-primary text-light" data-toggle="modal" data-target="#exampleModal">
+                            Quick Peek
+                        </a>
+                    </td>
+                    ';
+            $html .= '</tr>';
         }
         return $html;
     }
@@ -57,49 +139,62 @@ class OrderController extends Controller
      */
     public function addAction()
     {
-        $this->view->product = Products::find();
-        // $settings = Settings::find();
+        $this->view->product = (new Orders())->listProductsOrderPage($this->mongo);
 
         if ($this->request->isPost()) {
-
-            $order = new Orders();
-
-            //Event Fire
-            $event = $this->EventManager;
-            $inputdata = $event -> fire('listener:addOrder', $this);
-
-            $order->assign(
-                $inputdata,
-                [
-                    'customer_name',
-                    'customer_address',
-                    'zipcode',
-                    'product',
-                    'product_quantity'
-                ]
+            $order = array(
+                'customer_name' => $this->request->getPost('customer_name'),
+                'product_id' => $this->request->getPost('product_id'),
+                'product_quantity' => $this->request->getPost('product_quantity'),
+                'order_status' => 'Processing',
+                'order_date' => date('Y-m-d')
             );
-
-            $success = $order->save();
-
-            if ($success) {
-                Orders::find(
-                    [
-                        'conditions' => 'customer_name = :name: and customer_address = :address: and zipcode = :zip: and product = :prod: and product_quantity = :qty:',
-                        'bind'       => [
-                            'name' => $inputdata['customer_name'],
-                            'address' => $inputdata['customer_address'],
-                            'zip' => $inputdata['zipcode'],
-                            'prod' => $inputdata['product'],
-                            'qty' => $inputdata['product_quantity']
-                        ]
-                    ]
-                )[0];
-                $this->logs->info("Order Added: '" . $order->order_id . "'");
-            } 
-            else {
-                $this->logs->critical("Order Not Added succesfully due to following reason: <br>" . implode("<br>", $order->getMessages()));
+            if (null !== $this->request->getPost('variant')) {
+                $order['variant'] = $this->request->getPost('variant');
             }
-            $this->response->redirect("order?".BEARER."=".$this->request->getQuery(BEARER));
+
+            $this->mongo->order->insertOne($order);
+            $this->response->redirect('order');
         }
+    }
+
+    /**
+     * Delete Action
+     * Deletes the product by _id passed in get 'id'
+     *
+     * @return void
+     */
+    public function deleteAction()
+    {
+        if (null !== $this->request->getQuery('id')) {
+            $this->mongo->order->deleteOne(["_id" => new MongoDB\BSON\ObjectId($this->request->getQuery('id'))]);
+            $this->response->redirect("/order");
+        }
+    }
+
+    private function filterDate($startDate, $endDate)
+    {
+        $result = $this->mongo->order->find([
+            'order_date' => [
+                '$gte' => $startDate, '$lte' => $endDate
+            ]
+        ]
+        );
+        return $result;
+    }
+
+    public function updateStatusAction()
+    {
+        $result = $this->mongo->order->updateOne(
+            [
+                '_id' => new MongoDB\BSON\ObjectId($this->request->getPost('id'))
+            ],
+            [
+                '$set' => [
+                    'order_status' => $this->request->getPost('status')
+                ]
+            ]
+        );
+        return json_encode($result);
     }
 }

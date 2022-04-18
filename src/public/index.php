@@ -116,6 +116,7 @@ $container->set(
     function () {
         $objects = array(
             'sanitize' => new \helper\sanitize(),
+            // 'order' => new \models\Orders()
         );
         return (object)$objects;
     }

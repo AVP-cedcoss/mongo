@@ -2,13 +2,19 @@
 
 use Phalcon\Mvc\Model;
 
-Class Orders extends Model
+class Orders extends Model
 {
-    public $order_id;
-    public $customer_name;
-    public $customer_address;
-    public $zipcode;
-    public $product;
-    public $product_quantity;
-    public $date;
+    public function listProductsOrderPage($mongo)
+    {
+        $result = $mongo->product->find();
+        $product = [];
+        foreach ($result as $value) {
+            array_push($product, array(
+                'product_id' => strval($value->_id),
+                'product_name' => $value->product_name
+            )
+            );
+        }
+        return $product;
+    }
 }
