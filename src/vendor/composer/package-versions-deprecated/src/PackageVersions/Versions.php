@@ -38,7 +38,7 @@ final class Versions
   'jean85/pretty-package-versions' => '1.6.0@1e0104b46f045868f11942aea058cd7186d6c303',
   'mongodb/mongodb' => '1.12.0@e4a7594ac4b31635fa77455c4038a7013024ba28',
   'symfony/polyfill-php80' => 'v1.25.0@4407588e0d3f1f52efb65fbe92babe41f37fe50c',
-  '__root__' => 'No version set (parsed as 1.0.0)@',
+  '__root__' => 'dev-part1@dda70afb4d0651701608dd9dd45aa04421e11c50',
 );
 
     private function __construct()

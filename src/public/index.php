@@ -4,7 +4,6 @@
 // $_SERVER["REQUEST_URI"] = str_replace("/phalt/","/",$_SERVER["REQUEST_URI"]);
 // $_GET["_url"] = "/";
 
-use helper\listener;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
 use Phalcon\Mvc\View;
@@ -23,7 +22,7 @@ $config = new Config([]);
 // Define some absolute path constants to aid in locating resources
 define('BASE_PATH', dirname(__DIR__));
 define('APP_PATH', BASE_PATH . '/app');
-define('BEARER', 'bearer');
+define('URL_ROOT', 'http://localhost:8080');
 
 require_once(BASE_PATH."/vendor/autoload.php");
 
@@ -52,24 +51,6 @@ $loader->register();
 
 /******************************Events Start******************************** */
 $eventsManager = new EventsManager();
-
-//Default Before Handle Request
-$eventsManager->attach(
-    'application:beforeHandleRequest',
-    new \helper\listener()
-);
-
-//Product Event
-$eventsManager->attach(
-    'listener:addProduct',
-    new \helper\listener()
-);
-
-//Order Event
-$eventsManager->attach(
-    'listener:addOrder',
-    new \helper\listener()
-);
 
 /******************************Events End********************************** */
 
@@ -135,7 +116,6 @@ $container->set(
     function () {
         $objects = array(
             'sanitize' => new \helper\sanitize(),
-            'translate' => (new \helper\locale())->getTranslator()
         );
         return (object)$objects;
     }
@@ -158,11 +138,9 @@ $container->set(
 $container->set(
     'mongo',
     function () {
-        $mongo = new MongoClient();
-        
-    return $mongo->selectDB('phalt');
-    },
-    true
+        $mongo =  new MongoDB\Client('mongodb://mongo', array('username'=>'root',"password"=>'password123'));
+        return $mongo->mongodb;
+    }
 );
 /**********************************Container End********************************** */
 
