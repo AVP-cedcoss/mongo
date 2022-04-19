@@ -274,11 +274,11 @@ function displayPopup(id)
                 html+=`<h6>`+key+` : `+Data['meta'][key]+`</h6>`;
             }
         }
-        if (typeof(Data['varient']) != 'undefined') {
-            for (var key in Data['varient']) {
-                html+=`<h6>Varient `+(parseInt(key)+1)+` :`;
-                for (var value in Data['varient'][key]) {
-                    html+=`<br>`+value+` : `+Data['varient'][key][value];
+        if (typeof(Data['variant']) != 'undefined') {
+            for (var key in Data['variant']) {
+                html+=`<h6>Variant `+(parseInt(key)+1)+` :`;
+                for (var value in Data['variant'][key]) {
+                    html+=`<br>`+value+` : `+Data['variant'][key][value];
                 }
                 html+=`</h6>`;
             }
