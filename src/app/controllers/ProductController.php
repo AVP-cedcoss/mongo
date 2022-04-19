@@ -120,6 +120,9 @@ class ProductController extends Controller
                         <a href="/product/delete?id=' . $value->_id . '" class="btn btn-danger">Delete</a>
                     </td>
                     <td>
+                        <a href="/product/update?id=' . $value->_id . '" class="btn btn-warning">Update</a>
+                    </td>
+                    <td>
                         <a data-id="' . $value->_id . '" class="quickPeek btn btn-primary text-light" data-toggle="modal" data-target="#exampleModal">
                             Quick Peek
                         </a>
@@ -136,5 +139,42 @@ class ProductController extends Controller
         }
         // $html .= '</table>';
         return $html;
+    }
+
+    public function updateAction()
+    {
+        $this->view->result = json_decode(json_encode($this->mongo->product->findOne(["_id" => new MongoDB\BSON\ObjectId($this->request->getQuery('id'))])));
+
+        if ($this->request->isPost()) {
+            
+            if (null !== $this->request->isPost('additionalKey')) {
+                $meta = array_combine($this->request->getPost('additionalKey'), $this->request->getPost('additionalvalue'));
+            }
+            
+            if (null !== $this->request->getPost('variationKey')) {
+                $variant = array();
+                for ($i = 0; $i < (count($this->request->getPost('variationKey'))); $i++) {
+                    array_push($variant, array_combine($this->request->getPost('variationKey')[$i], $this->request->getPost('variationValue')[$i]));
+                }
+                for ($i = 0; $i < (count($this->request->getPost('variationKey'))); $i++) {
+                    $variant[$i]["VariantPrice"] = $this->request->getPost("variationPrice" . $i);
+                }
+            }
+
+            $product = array(
+                'product_name' => $this->request->getPost('product_name'),
+                'product_category' => $this->request->getPost('product_category'),
+                'product_stock' => $this->request->getPost('product_stock'),
+                'product_price' => $this->request->getPost('product_price'),
+            );
+            if (isset($meta)) {
+                $product['meta'] = $meta;
+            }
+            if (isset($variant)) {
+                $product['variant'] = $variant;
+            }
+            $this->mongo->product->updateOne(["_id" => new MongoDB\BSON\ObjectId($this->request->getQuery('id'))], ['$set' => $product]);
+            $this->response->redirect('product');
+        }
     }
 }
